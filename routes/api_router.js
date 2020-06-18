@@ -75,14 +75,28 @@ router.post('/topic/:id/edit',(req,res)=>{
 
 router.get('/topic/delete/:id',(req,res)=>{
     var id = req.params.id
-    console.log(id)
-    var sql = `DELETE FROM topic WHERE id=${id}`
+    db.query(`SELECT * FROM topic WHERE id=${id}`,(err,result)=>{
+        var title = result[0].title
+        var description = result[0].description
+        var author = result[0].author
+        var sql_1 = `INSERT INTO deletelist (title, description, author) VALUES(?, ?, ?)`
+        var data_1 = [title, description, author]
+        db.query(sql_1,data_1,(err,result)=>{
+            if(err){
+                console.log(err)
+                res.status(500).send("ERROR")
+            }
+
+        })
+
+        var sql = `DELETE FROM topic WHERE id=${id}`
     db.query(sql,(err,result)=>{
         if(err){
             console.log(err)
             res.status(500).send("Delete Error")
         }
         res.redirect(`/topic`)
+        })
     })
 })
 
